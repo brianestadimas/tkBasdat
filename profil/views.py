@@ -9,25 +9,22 @@ def index(request):
 	cursor=connection.cursor()
     email = request.POST['email']
     password = request.POST['password']
-    cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
-    select=cursor.fetchone()
-    profile_user(select)
-	cursor=connection.cursor()
-    if select:
-    	cursor.execute("SELECT nama from SION.DONATUR where EMAIL='"+email+"'")
-    	select=cursor.fetchone()
-    	if select :
-    		response['nama'] = select[0]
-    		#........
-    	cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
-    	select=cursor.fetchone()
-    	if select :
-    		response['nama'] = select[0]
+
+    if cursorSelect('*','SION.RELAWAN'):
+
+    	if cursorSelect('nama','SION.RELAWAN') :
+    		response['nama'] = cursorSelect('nama','SION.RELAWAN')[0]
+
+    	if selectcursorSelect('nama','SION.DONATUR') :
+    		response['nama'] = cursorSelect('nama','SION.DONATUR')[0]
     		#....
-    	cursor.execute("SELECT nama from SION.SPONSOR where EMAIL='"+email+"'")
-    	select=cursor.fetchone()
-    	if select :
-    		response['nama'] = select[0]
+    	if cursorSelect('nama','SION.SPONSOR') :
+    		response['nama'] = cursorSelect('nama','SION.SPONSOR')[0]
+
+def cursorSelect(param, database):
+	cursor=connection.cursor()
+	cursor.execute("SELECT " + param + " from " + database + " where EMAIL='"+email+"'")
+	return cursor.fetchone()
 
 def profile_org_all()
 	
