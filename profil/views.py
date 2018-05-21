@@ -14,6 +14,7 @@ def index(request):
     profile_user(select)
 
 def profile_user(select)
+	cursor=connection.cursor()
     if select:
     	cursor.execute("SELECT nama from SION.DONATUR where EMAIL='"+email+"'")
     	select=cursor.fetchone()
