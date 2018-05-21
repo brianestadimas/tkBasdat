@@ -1,3 +1,33 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.db import connection
+from login.views import role
 
-# Create your views here.
+response = {}
+def index(request):
+	cursor=connection.cursor()
+    email = request.POST['email']
+    password = request.POST['password']
+    cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
+    select=cursor.fetchone()
+    if select:
+    	cursor.execute("SELECT nama from SION.DONATUR where EMAIL='"+email+"'")
+    	select=cursor.fetchone()
+    	if select :
+    		response['nama'] = select[0]
+    		#........
+    	cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
+    	select=cursor.fetchone()
+    	elif select :
+    		response['nama'] = select[0]
+    		#....
+    	cursor.execute("SELECT nama from SION.SPONSOR where EMAIL='"+email+"'")
+    	select=cursor.fetchone()
+    	elif select :
+    		response['nama'] = select[0]
+
+    ######## Brian ##########
+
+
+
