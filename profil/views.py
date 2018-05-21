@@ -11,6 +11,9 @@ def index(request):
     password = request.POST['password']
     cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
     select=cursor.fetchone()
+    profile_user(select)
+
+def profile_user(select)
     if select:
     	cursor.execute("SELECT nama from SION.DONATUR where EMAIL='"+email+"'")
     	select=cursor.fetchone()
@@ -27,6 +30,8 @@ def index(request):
     	elif select :
     		response['nama'] = select[0]
 
+def 
+	
     ######## Brian ##########
 
 
