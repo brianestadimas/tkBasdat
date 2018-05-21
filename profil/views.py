@@ -12,8 +12,6 @@ def index(request):
     cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
     select=cursor.fetchone()
     profile_user(select)
-
-def profile_user(select)
 	cursor=connection.cursor()
     if select:
     	cursor.execute("SELECT nama from SION.DONATUR where EMAIL='"+email+"'")
@@ -23,15 +21,15 @@ def profile_user(select)
     		#........
     	cursor.execute("SELECT nama from SION.RELAWAN where EMAIL='"+email+"'")
     	select=cursor.fetchone()
-    	elif select :
+    	if select :
     		response['nama'] = select[0]
     		#....
     	cursor.execute("SELECT nama from SION.SPONSOR where EMAIL='"+email+"'")
     	select=cursor.fetchone()
-    	elif select :
+    	if select :
     		response['nama'] = select[0]
 
-def 
+def profile_org_all()
 	
     ######## Brian ##########
 
