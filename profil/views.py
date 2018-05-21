@@ -10,16 +10,19 @@ def index(request):
     email = request.POST['email']
     password = request.POST['password']
 
-    if cursorSelect('*','SION.RELAWAN'):
+    if cursorSelect('*','SION.USER'):
 
     	if cursorSelect('nama','SION.RELAWAN') :
     		response['nama'] = cursorSelect('nama','SION.RELAWAN')[0]
 
-    	if selectcursorSelect('nama','SION.DONATUR') :
+    	elif selectcursorSelect('nama','SION.DONATUR') :
     		response['nama'] = cursorSelect('nama','SION.DONATUR')[0]
     		#....
-    	if cursorSelect('nama','SION.SPONSOR') :
+    	elif cursorSelect('nama','SION.SPONSOR') :
     		response['nama'] = cursorSelect('nama','SION.SPONSOR')[0]
+
+    	elif cursorSelect('nama','SION.SPONSOR') :
+    		response['nama'] = cursorSelect('nama','SION.PENGURUS')[0]
 
 def cursorSelect(param, database):
 	cursor=connection.cursor()
