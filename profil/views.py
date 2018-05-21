@@ -8,21 +8,30 @@ response = {}
 def index(request):
 	cursor=connection.cursor()
     email = request.POST['email']
+    global email
     password = request.POST['password']
 
-    if cursorSelect('*','SION.USER'):
+    if cursorSelect('*','SION.USER',email):
 
     	if cursorSelect('nama','SION.RELAWAN') :
-    		response['nama'] = cursorSelect('nama','SION.RELAWAN')[0]
+    		response['nama'] = cursorSelect('nama','SION.RELAWAN',email,)[0]
+			response['email'] = cursorSelect('email','SION.RELAWAN',email)[0]
+			response['kecamatan'] = cursorSelect('kecamatan','SION.RELAWAN',email)[0]
+			response['kabupaten'] = cursorSelect('kabupaten','SION.RELAWAN',email)[0]
+			response['provinsi'] = cursorSelect('email','SION.RELAWAN',email)[0]
+			response['kodepos'] = cursorSelect('kodepos','SION.RELAWAN',email)[0]
+			response['kelurahan'] = cursorSelect('kelurahan','SION.RELAWAN',email)[0]
+			return (request, 'profil_relawan.html', response)
 
     	elif selectcursorSelect('nama','SION.DONATUR') :
-    		response['nama'] = cursorSelect('nama','SION.DONATUR')[0]
+    		response['nama'] = cursorSelect('nama','SION.DONATUR',email)[0]
     		#....
     	elif cursorSelect('nama','SION.SPONSOR') :
-    		response['nama'] = cursorSelect('nama','SION.SPONSOR')[0]
+    		response['nama'] = cursorSelect('nama','SION.SPONSOR',email)[0]
 
-    	elif cursorSelect('nama','SION.SPONSOR') :
-    		response['nama'] = cursorSelect('nama','SION.PENGURUS')[0]
+    	elif cursorSelect('nama','SION.PENGURUS') :
+    		response['nama'] = cursorSelect('nama','SION.PENGURUS',email)[0]
+
 
 
      ######## Brian ##########
@@ -56,6 +65,6 @@ def showClickedOrg(email):
 
 	for elem in cursorSelect('nama','')
 		response['sponsor_list'] = cursor('status_verifikasi','SION.ORGANISASI', email)
-		
+
 	response['donatur_list'] = cursor('status_verifikasi','SION.ORGANISASI', email)
 	response['donatur_list'] = cursor('status_verifikasi','SION.ORGANISASI', email)
