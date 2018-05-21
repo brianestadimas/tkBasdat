@@ -24,14 +24,38 @@ def index(request):
     	elif cursorSelect('nama','SION.SPONSOR') :
     		response['nama'] = cursorSelect('nama','SION.PENGURUS')[0]
 
-def cursorSelect(param, database):
+
+     ######## Brian ##########
+     if cursorSelect("*", 'SION.ORGANISASI'):
+     	showAllOrg()
+
+
+def cursorSelect(param, database, email):
 	cursor=connection.cursor()
-	cursor.execute("SELECT " + param + " from " + database + " where EMAIL='"+email+"'")
+	cursor.execute("SELECT " + param + " from " + database + " where EMAIL= "+email+"")
 	return cursor.fetchone()
 
-def profile_org_all()
-	
-    ######## Brian ##########
+def cursor(param, database):
+	cursor=connection.cursor()
+	cursor.execute("SELECT " + param + " from " + database)
+	return cursor.fetchone()
 
+def showAllOrg():
+	response['nama_org'] = cursor('nama','SION.ORGANISASI')
+	response['website_org'] = cursor('website','SION.ORGANISASI')
 
+def showClickedOrg(email):
+	response['nama_org'] = cursor('nama','SION.ORGANISASI', email)
+	response['website_org'] = cursor('website','SION.ORGANISASI', email)
+	response['provinsi_org'] = cursor('nama','SION.ORGANISASI', email)
+	response['kabupaten_kota_org'] = cursor('kabupaten_kota','SION.ORGANISASI', email)
+	response['kecamatan_org'] = cursor('kecamatan','SION.ORGANISASI', email)
+	response['kelurahan_org'] = cursor('kelurahan','SION.ORGANISASI', email)
+	response['kode_pos_org'] = cursor('kode_pos','SION.ORGANISASI', email)
+	response['status_verifikasi_org'] = cursor('status_verifikasi','SION.ORGANISASI', email)
 
+	for elem in cursorSelect('nama','')
+		response['sponsor_list'] = cursor('status_verifikasi','SION.ORGANISASI', email)
+		
+	response['donatur_list'] = cursor('status_verifikasi','SION.ORGANISASI', email)
+	response['donatur_list'] = cursor('status_verifikasi','SION.ORGANISASI', email)
