@@ -60,9 +60,15 @@ def register(request):
         form = RegisterForm()
         return render(request, 'login.html', {'form': form})
 
+
+
+# FIXME : @brianestadimas why is it here? does it have anything related to login? is not even called anywhere (afaik, cmiiw). Also read comment below
+# Whats in response?
+# it wont get returned on all occassion? (even on post request), are you sure it is intended that its for not logged in user?
+# whats with connection without any initiation, im pretty sure it will get error on runtime!
 def donasi_org(request):
     if 'logged_in' not in request.session or not request.session['logged_in']:
-        if(request.method == 'POST'):
+        if (request.method == 'POST'):
             cursor = connection.cursor()
             cursor.execute("SELECT Nama from SION.ORGANISASI")
             selectnama = cursor.fetchone()
@@ -70,6 +76,7 @@ def donasi_org(request):
 
             cursor.execute("SELECT Nominal from SION.DONATUR_ORGANISASI WHERE Organisasi = 'selected_name'")
             donasi = cursor.fetchone()
-            donasi-=nominal
+            donasi -= nominal
             cursor.execute("UPDATE DONATUR_ORGANISASI SET Nominal = donasi WHERE Organisasi = 'selected_name'")
+
     return render(request, 'donasi_org.html')
