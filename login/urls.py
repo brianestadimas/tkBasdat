@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 
-from login.views import index, register
+from login.views import index, register, logout
 
 urlpatterns = [
-    url(r'login^$', index, name='index'),
-    url(r'register^$', register, name='register'),
+    url('login/', index, name='index'),
+    url('register/', register, name='register'),
+    url('logout/', logout, name='logout'),
 ]

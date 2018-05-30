@@ -2,26 +2,27 @@
 {% block content %}
     <style>
         .form-control {
-            margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+            margin: 1rem 1rem 1rem 1rem;
         }
 
     </style>
     <section class="banner_area">
         <div class="container">
             <div class="banner_inner_text">
-                <h2>LOGIN</h2>
+                <h2>Registrasi</h2>
                 <p>Sistem Informasi Organisasi Nirlaba
                     <br>TK 4 - Basdat</p>
             </div>
         </div>
     </section>
     <div class="container" style="margin-top:100px;margin-bottom:100px;">
+
         <form action="" method="post">
             {% csrf_token %}
             <table>
                 {{ form }}
             </table>
-            <input type="submit" value="Submit" class="btn"/>
+            <input type="submit" value="Submit" class="button btn"/>
         </form>
     </div>
 {% endblock %}

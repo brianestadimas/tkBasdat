@@ -1,14 +1,20 @@
 from django.db import connection
-from django.shortcuts import render
-
-from login.auth_utils import generate_token, dictfetchall
-from .forms import LoginForm, RegisterForm
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from login.auth_utils import dictfetchall
+from .forms import LoginForm, RegisterForm, DonaturForm, RelawanForm, SponsorForm, OrganisasiForm
 import bcrypt
 
 
 # Create your views here.
 
 def index(request):
+    if 'logged_in' in request.session and request.session['logged_in']:
+        if 'user_data' not in request.session:
+            return redirect('google.com')
+        else:
+            return redirect_on_role(request.session['user_data']['role'])
+
     if request.method == 'POST':
         form_data = LoginForm(request.POST)
 
@@ -17,66 +23,168 @@ def index(request):
         #      check if found return request with token session
 
         if form_data.is_valid():
-            hashed_password = None
+            password = None
             user_id = None
             with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM sion.user WHERE sion.user.email = %s", [form_data.username])
+                cursor.execute("SELECT * FROM sion.system_user WHERE sion.system_user.email = %s",
+                               [form_data.cleaned_data['username']])
                 rows = dictfetchall(cursor)
-                if len(rows) == 0:      #gaketemu
-                    return
+                if len(rows) == 0:
+                    return render(request, 'login.html',
+                                  {'message': "Username not found", 'form': LoginForm(initial=form_data.cleaned_data)})
                 else:
                     user_id = rows[0]['email']
-                    hashed_password = rows[0]['password']
+                    password = rows[0]['password']
                 #  set hashed password if user with username found
                 #  else return not found
-
-            if hashed_password is not None and bcrypt.checkpw(form_data.password, hashed_password):
+            if password is not None and form_data.cleaned_data['password'] == password:
                 # correct password > return to page wanted page and set session on request
-                pass
+                request.session['logged_in'] = True
+                role = None
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM sion.donatur WHERE sion.donatur.email = %s",
+                                   [user_id])
+                    rows = dictfetchall(cursor)
+
+                    if len(rows) > 0:
+                        request.session['user_data'] = {'role': 'donatur', 'email': user_id}
+                        role = 'donatur'
+
+                    cursor.execute("SELECT * FROM sion.relawan WHERE sion.relawan.email = %s",
+                                   [user_id])
+                    rows = dictfetchall(cursor)
+
+                    if len(rows) > 0:
+                        request.session['user_data'] = {'role': 'relawan', 'email': user_id}
+                        role = 'relawan'
+
+                    cursor.execute("SELECT * FROM sion.sponsor WHERE sion.sponsor.email = %s",
+                                   [user_id])
+                    rows = dictfetchall(cursor)
+
+                    if len(rows) > 0:
+                        request.session['user_data'] = {'role': 'sponsor',
+                                                        'email': user_id}
+                        role = 'sponsor'
+
+                    if role is not None:
+                        return redirect_on_role(role)
+
+                    return render(request, 'login.html', {'message': "Cannot determine role", 'form': LoginForm()})
+
+            else:
+                # do something if form data is not valid
+                return render(request, 'login.html', {'message': ":p wrong password", 'form': LoginForm()})
+
         else:
             #  do something if form data is not valid
-            pass
+            return render(request, 'login.html', {'message': "Invalid data", 'form': LoginForm()})
 
-        request.session['user_session'] = generate_token(user_id)
-        return
+
     else:
         form = LoginForm()
         return render(request, 'login.html', {'form': form})
 
 
+def redirect_on_role(role):
+    if role == 'donatur':
+        pass
+    elif role == 'relawan':
+        pass
+    elif role == 'sponsor':
+        pass
+
+
 def register(request):
-    if request.method == 'POST':
-        form_data = RegisterForm(request.POST)
-        to_be_saved_username = form_data.username
-        to_be_saved_password = bcrypt.hashpw(form_data.password, bcrypt.gensalt())
-
-        # save here to db
-        with connection.cursor() as cursor:
-            pass
-
-        #  return with session
-
-    else:
+    # resolve form
+    if 'selected_role' not in request.session:
         form = RegisterForm()
-        return render(request, 'login.html', {'form': form})
+    else:
+        role = request.session['selected_role']
+        if role == 'donatur':
+            form = DonaturForm()
+        if role == 'relawan':
+            form = RelawanForm()
+        if role == 'sponsor':
+            form = SponsorForm()
+
+    if request.method == 'POST':
+        if 'selected_role' not in request.session:
+            form_data = RegisterForm(request.POST)
+            if form_data.is_valid():
+
+                name = form_data.cleaned_data['username']
+                username = form_data.cleaned_data['username']
+                password = form_data.cleaned_data['password']
+                address = form_data.cleaned_data['address']
+                role = form_data.cleaned_data['role_selection']
+
+                # save here to db
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "INSERT INTO sion.system_user (email, password, nama, alamat_lengkap) VALUES (%s,%s,%s,%s)", [
+                            username, name, password, address
+                        ])
+                    request.session['selected_role'] = role
+                    request.session['logged_in'] = True
+
+                    if role == 'donatur':
+                        form = DonaturForm()
+                    if role == 'relawan':
+                        form = RelawanForm()
+                    if role == 'sponsor':
+                        form = SponsorForm()
+
+                return render(request, 'registrasi.html', {'form': form})
+            else:
+                return render(request, 'registrasi.html', {'form': form, 'message': 'Invalid data !'})
+        else:
+            role = request.session['selected_role']
+            # register organization first
+            org_data = OrganisasiForm(request.POST)
+            with connection.cursor() as cursor:
+                cursor.execute()
+                # register user
+                if role == 'donatur':
+                    form_data = DonaturForm(request.POST)
+                    cursor.execute()
+
+                if role == 'relawan':
+                    form_data = RelawanForm(request.POST)
+                    cursor.execute()
+
+                if role == 'sponsor':
+                    form_data = SponsorForm(request.POST)
+                    cursor.execute()
+
+                # add as org admin
+                cursor.execute()
+
+    #             dont forget to set user data here
+    else:
+        return render(request, 'registrasi.html', {'form': form})
 
 
+def logout(request, *args, **kwargs):
+    request.session.clear()
+    request.session.modified = True
+    return redirect('user/login/')
 
-# FIXME : @brianestadimas why is it here? does it have anything related to login? is not even called anywhere (afaik, cmiiw). Also read comment below
-# Whats in response?
-# it wont get returned on all occassion? (even on post request), are you sure it is intended that its for not logged in user?
-# whats with connection without any initiation, im pretty sure it will get error on runtime!
-def donasi_org(request):
-    if 'logged_in' not in request.session or not request.session['logged_in']:
-        if (request.method == 'POST'):
-            cursor = connection.cursor()
-            cursor.execute("SELECT Nama from SION.ORGANISASI")
-            selectnama = cursor.fetchone()
-            response['selectnama'] = selectnama
-
-            cursor.execute("SELECT Nominal from SION.DONATUR_ORGANISASI WHERE Organisasi = 'selected_name'")
-            donasi = cursor.fetchone()
-            donasi -= nominal
-            cursor.execute("UPDATE DONATUR_ORGANISASI SET Nominal = donasi WHERE Organisasi = 'selected_name'")
-
-    return render(request, 'donasi_org.html')
+# FIXME : @brianestadimas why is it here? does it have anything related to login? is not even called anywhere (afaik,
+#  cmiiw). Also read comment below Whats in response? it wont get returned on all occassion? (even on post request),
+# are you sure it is intended that its for not logged in user? whats with connection without any initiation,
+# im pretty sure it will get error on runtime!
+# def donasi_org(request):
+#     if 'logged_in' not in request.session or not request.session['logged_in']:
+#         if (request.method == 'POST'):
+#             cursor = connection.cursor()
+#             cursor.execute("SELECT Nama from SION.ORGANISASI")
+#             selectnama = cursor.fetchone()
+#             response['selectnama'] = selectnama
+#
+#             cursor.execute("SELECT Nominal from SION.DONATUR_ORGANISASI WHERE Organisasi = 'selected_name'")
+#             donasi = cursor.fetchone()
+#             donasi -= nominal
+#             cursor.execute("UPDATE DONATUR_ORGANISASI SET Nominal = donasi WHERE Organisasi = 'selected_name'")
+#
+#     return render(request, 'donasi_org.html')
