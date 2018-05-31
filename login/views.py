@@ -113,7 +113,7 @@ def register(request):
             form_data = RegisterForm(request.POST)
             if form_data.is_valid():
 
-                name = form_data.cleaned_data['username']
+                name = form_data.cleaned_data['name']
                 username = form_data.cleaned_data['username']
                 password = form_data.cleaned_data['password']
                 address = form_data.cleaned_data['address']
@@ -126,6 +126,7 @@ def register(request):
                             username, name, password, address
                         ])
                     request.session['selected_role'] = role
+                    request.session['registrar_email'] = username
                     request.session['logged_in'] = True
 
                     if role == 'donatur':
@@ -142,20 +143,65 @@ def register(request):
             role = request.session['selected_role']
             # register organization first
             org_data = OrganisasiForm(request.POST)
+            if org_data.is_valid():
+                username = org_data.cleaned_data['username']
+                website = org_data.cleaned_data['website']
+                name = org_data.cleaned_data['name']
+                provinsi = org_data.cleaned_data['provinsi']
+                kabupaten = org_data.cleaned_data['kabupaten']
+                kecamatan = org_data.cleaned_data['kecamatan']
+                kelurahan = org_data.cleaned_data['kelurahan']
+                kodepos = org_data.cleaned_data['kodepos']
+
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "INSERT INTO sion.organisasi (email_organisasi, website, nama, provinsi, kabupaten_kota, kecamatan, kelurahan, kode_pos, status_verifikasi) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                        [
+                            username, website, name, provinsi, kabupaten, kecamatan, kelurahan, kodepos, 'Not Verified'
+                        ])
+
             with connection.cursor() as cursor:
+                user_email = request.session['registrar_email']
+
                 cursor.execute()
                 # register user
                 if role == 'donatur':
                     form_data = DonaturForm(request.POST)
-                    cursor.execute()
+                    if(form_data.is_valid()) :
+                        saldo = form_data.cleaned_data['saldo']
+
+                        with connection.cursor() as cursor :
+                            cursor.execute(
+                                "INSERT INTO sion.donatur (email, saldo) VALUES (%s,%s)",
+                                [
+                                    user_email, saldo
+                                ])
 
                 if role == 'relawan':
                     form_data = RelawanForm(request.POST)
-                    cursor.execute()
+                    if(form_data.is_valid()) :
+                        birthdate = form_data.cleaned_data['birthdate']
+                        phonenumber = form_data.cleaned_data['phonenumber']
+                        #skills = form_data.cleaned_data['skills']                  *harusnya ada 1 tabel lg keahlian karyawan
+
+                        with connection.cursor() as cursor :
+                            cursor.execute(
+                                "INSERT INTO sion.relawan (email, no_hp, tanggal_lahir) VALUES (%s,%s,%s)",
+                                [
+                                    user_email, phonenumber, birthdate
+                                ])
 
                 if role == 'sponsor':
                     form_data = SponsorForm(request.POST)
-                    cursor.execute()
+                    if(form_data.is_valid()) :
+                        logo = form_data.cleaned_data['logo']
+
+                        with connection.cursor() as cursor :
+                            cursor.execute(
+                                "INSERT INTO sion.relawan (email, logo) VALUES (%s,%s)",
+                                [
+                                    user_email, logo
+                                ])
 
                 # add as org admin
                 cursor.execute()
