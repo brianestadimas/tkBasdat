@@ -11,9 +11,9 @@ import bcrypt
 def index(request):
     if 'logged_in' in request.session and request.session['logged_in']:
         if 'user_data' not in request.session:
-            return redirect('google.com')
+            return render(request, 'message.html', {'message': "Already logged in, yet no role found!"})
         else:
-            return redirect_on_role(request.session['user_data']['role'])
+            return redirect_on_role(request, request.session['user_data']['role'])
 
     if request.method == 'POST':
         form_data = LoginForm(request.POST)
@@ -86,14 +86,8 @@ def index(request):
         return render(request, 'login.html', {'form': form})
 
 
-def redirect_on_role(role):
-    if role == 'donatur':
-        pass
-    elif role == 'relawan':
-        pass
-    elif role == 'sponsor':
-        pass
-
+def redirect_on_role(request, role):
+    return render(request, 'message.html', {'message': "Already logged in, yet no role found!"})
 
 def register(request):
     # resolve form
@@ -165,10 +159,10 @@ def register(request):
 
                 if role == 'donatur':
                     form_data = DonaturForm(request.POST)
-                    if(form_data.is_valid()) :
+                    if (form_data.is_valid()):
                         saldo = form_data.cleaned_data['saldo']
 
-                        with connection.cursor() as cursor :
+                        with connection.cursor() as cursor:
                             cursor.execute(
                                 "INSERT INTO sion.donatur (email, saldo) VALUES (%s,%s)",
                                 [
@@ -177,12 +171,12 @@ def register(request):
 
                 if role == 'relawan':
                     form_data = RelawanForm(request.POST)
-                    if(form_data.is_valid()) :
+                    if (form_data.is_valid()):
                         birthdate = form_data.cleaned_data['birthdate']
                         phonenumber = form_data.cleaned_data['phonenumber']
-                        #skills = form_data.cleaned_data['skills']                  *harusnya ada 1 tabel lg keahlian karyawan
+                        # skills = form_data.cleaned_data['skills']                  *harusnya ada 1 tabel lg keahlian karyawan
 
-                        with connection.cursor() as cursor :
+                        with connection.cursor() as cursor:
                             cursor.execute(
                                 "INSERT INTO sion.relawan (email, no_hp, tanggal_lahir) VALUES (%s,%s,%s)",
                                 [
@@ -191,20 +185,19 @@ def register(request):
 
                 if role == 'sponsor':
                     form_data = SponsorForm(request.POST)
-                    if(form_data.is_valid()) :
+                    if (form_data.is_valid()):
                         logo = form_data.cleaned_data['logo']
 
-                        with connection.cursor() as cursor :
+                        with connection.cursor() as cursor:
                             cursor.execute(
                                 "INSERT INTO sion.relawan (email, logo) VALUES (%s,%s)",
                                 [
                                     user_email, logo
                                 ])
 
-                # add as org admin
+                request.session['user_data'] = {'role': role, 'email': user_email}
+                return redirect_on_role(request, role)
 
-
-    #             dont forget to set user data here
     else:
         return render(request, 'registrasi.html', {'form': form})
 
