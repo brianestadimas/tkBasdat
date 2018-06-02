@@ -68,7 +68,7 @@ def index(request):
                         role = 'sponsor'
 
                     if role is not None:
-                        return redirect_on_role(role)
+                        return redirect_on_role(request, role)
 
                     return render(request, 'login.html', {'message': "Cannot determine role", 'form': LoginForm()})
 
