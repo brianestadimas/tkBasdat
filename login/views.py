@@ -26,7 +26,7 @@ def index(request):
             password = None
             user_id = None
             with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM sion.system_user WHERE sion.system_user.email = %s",
+                cursor.execute("SELECT * FROM sion.user WHERE sion.user.email = %s",
                                [form_data.cleaned_data['username']])
                 rows = dictfetchall(cursor)
                 if len(rows) == 0:
@@ -122,7 +122,7 @@ def register(request):
                 # save here to db
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO sion.system_user (email, password, nama, alamat_lengkap) VALUES (%s,%s,%s,%s)", [
+                        "INSERT INTO sion.user (email, password, nama, alamat_lengkap) VALUES (%s,%s,%s,%s)", [
                             username, name, password, address
                         ])
                     request.session['selected_role'] = role

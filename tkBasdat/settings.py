@@ -25,7 +25,7 @@ SECRET_KEY = '4!(d)=ukpbi+^dy!vxrnvy-t8@26v2lgcnp&z3_eli@n5^!4$t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['152.118.25.3']
 
 
 # Application definition
@@ -47,8 +47,7 @@ DATABASES = {
   'USER': 'db075',
   'PASSWORD': 'phegeo0O',
   'HOST': 'dbpg.cs.ui.ac.id',
-  'PORT': '8095',
- }
+  }
 }
 
 
