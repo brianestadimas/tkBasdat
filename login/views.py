@@ -163,8 +163,6 @@ def register(request):
             with connection.cursor() as cursor:
                 user_email = request.session['registrar_email']
 
-                cursor.execute()
-                # register user
                 if role == 'donatur':
                     form_data = DonaturForm(request.POST)
                     if(form_data.is_valid()) :
@@ -204,7 +202,7 @@ def register(request):
                                 ])
 
                 # add as org admin
-                cursor.execute()
+
 
     #             dont forget to set user data here
     else:

@@ -38,16 +38,16 @@ class OrganisasiForm(forms.Form):
 
 class DonaturForm(OrganisasiForm):
     saldo = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class' : 'form-contol'}))
-    pass
+
 
 
 class SponsorForm(OrganisasiForm):
     logo = forms.FileField()
-    pass
+
 
 
 class RelawanForm(OrganisasiForm):
     birthdate = forms.DateField(widget=forms.DateInput(format='%d-%m-%Y', attrs={'class': 'form-control', 'type': 'date'}))
     phonenumber = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     skills = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    pass
+
