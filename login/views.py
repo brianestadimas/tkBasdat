@@ -87,7 +87,11 @@ def index(request):
 
 
 def redirect_on_role(request, role):
-    return render(request, 'message.html', {'message': "Already logged in, yet no role found!"})
+    if role is None:
+        return render(request, 'message.html', {'message': "Already logged in, yet no role found!"})
+    else:
+        return render(request, 'message.html', {'message': "Welcome {}".format(role)})
+
 
 def register(request):
     # resolve form
